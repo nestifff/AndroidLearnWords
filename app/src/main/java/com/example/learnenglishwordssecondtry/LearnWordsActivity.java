@@ -25,6 +25,10 @@ import java.util.Random;
 
 public class LearnWordsActivity extends AppCompatActivity {
 
+    /*
+    Комммент просто чтобы был
+     */
+
     private static final String TAG = "LearnWordsActivity";
     private static final String WORD_INDEX = "index";
 
