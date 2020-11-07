@@ -8,17 +8,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -117,22 +118,25 @@ public class ViewWordsActivity extends AppCompatActivity {
 
 
         public class MyViewHolder extends RecyclerView.ViewHolder
-                            implements View.OnClickListener{
+                            /*implements View.OnClickListener*/{
 
             private TextView rusTextView;
             private TextView engTextView;
             private ImageButton deleteWordButton;
+            private LinearLayout blockChangeWord;
 
             private Word word;
 
+            private ChangeWordClickListener clickListener;
+
             private MyViewHolder(View itemView) {
+
                 super(itemView);
 
-                itemView.setOnClickListener(this);
-
-                rusTextView = itemView.findViewById(R.id.word_view_rus);
-                engTextView = itemView.findViewById(R.id.word_view_eng);
-                deleteWordButton = itemView.findViewById(R.id.deleteWord_Button);
+                rusTextView = itemView.findViewById(R.id.textView_viewRusWord);
+                engTextView = itemView.findViewById(R.id.textView_viewEngWord);
+                deleteWordButton = itemView.findViewById(R.id.button_deleteWord);
+                blockChangeWord = itemView.findViewById(R.id.linearLayout_changeWord);
 
                 deleteWordButton.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -140,37 +144,38 @@ public class ViewWordsActivity extends AppCompatActivity {
                         wordsInProcessSet.deleteWord(word);
                     }
                 });
+
+                clickListener = new ChangeWordClickListener();
+                itemView.setOnClickListener(clickListener);
             }
 
-            @Override
-            public void onClick(View view) {
-                //Toast.makeText(ViewWordsActivity.this, "Clicked", Toast.LENGTH_SHORT).show();
-
-                Intent intent = ViewChangeWordActivity.newIntent(
-                        ViewWordsActivity.this, word.getID());
-                startActivity(intent);
-
-            }
         }
 
         @Override
         public MyAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
             Context context = parent.getContext();
             LayoutInflater inflater = LayoutInflater.from(context);
 
             View contactView = inflater.inflate(R.layout.view_set_item, parent, false);
 
-            // Return a new holder instance
             return new MyViewHolder(contactView);
         }
 
         @Override
         public void onBindViewHolder(MyAdapter.MyViewHolder holder, int position) {
-            // Get the data model based on position
-            Word word = wordsSet.get(position);
 
-            // Set item views based on your views and data model
+            // Collapse (probably opened by user previously) view
+            MyViewHolder itemHolder = holder;
+            itemHolder.blockChangeWord.setVisibility(View.GONE);
+            itemHolder.deleteWordButton.setVisibility(View.VISIBLE);
+
+            Word word = wordsSet.get(position);
             holder.word = word;
+
+            holder.clickListener.setWord(word);
+            holder.clickListener.setContext(getApplicationContext());
+
             TextView rusTextView = holder.rusTextView;
             rusTextView.setText(word.wordRus);
             TextView endTextView = holder.engTextView;
@@ -182,6 +187,26 @@ public class ViewWordsActivity extends AppCompatActivity {
         public int getItemCount() {
             return wordsSet.size();
         }
+    }
+
+    private void deleteItem(View rowView, final int position) {
+
+        Animation anim = AnimationUtils.loadAnimation(getApplicationContext()),
+                android.R.anim.slide_out_right);
+        anim.setDuration(300);
+        rowView.startAnimation(anim);
+
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                if (myDataSource.size() == 0) {
+                    addEmptyView(); // adding empty view instead of the RecyclerView
+                    return;
+                }
+                myDataSource.remove(position); //Remove the current content from the array
+                myRVAdapter.notifyDataSetChanged(); //Refresh list
+            }
+
+        }, anim.getDuration());
     }
 
 }

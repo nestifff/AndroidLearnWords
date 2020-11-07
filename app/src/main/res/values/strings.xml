@@ -38,7 +38,7 @@
     <string name="text_askChooseSetToView">Choose set of words to view
                                             \nor change:</string>
 
-    <string name="button_changeWord">Change word</string>
+    <string name="button_changeWord">Accept</string>
 
     <string name="new_word_menu_item">Add word</string>
 
