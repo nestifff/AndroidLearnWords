@@ -1,4 +1,4 @@
-package com.example.learnenglishwordssecondtry;
+package com.example.learnenglishwordssecondtry.menuMain;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.example.learnenglishwordssecondtry.R;
+import com.example.learnenglishwordssecondtry.learnWords.ChooseSetToLearnActivity;
+import com.example.learnenglishwordssecondtry.viewChangeWords.ChooseSetToViewActivity;
 
 
 //chose what to do, first window
@@ -46,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ChooseSetToViewActivity.class);
                 startActivity(intent);
-                //Toast.makeText(MainActivity.this, "This option isn't available", Toast.LENGTH_SHORT).show();
             }
         });
 

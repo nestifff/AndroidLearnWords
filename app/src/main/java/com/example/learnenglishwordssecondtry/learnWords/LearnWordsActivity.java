@@ -1,4 +1,4 @@
-package com.example.learnenglishwordssecondtry;
+package com.example.learnenglishwordssecondtry.learnWords;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,6 +14,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.learnenglishwordssecondtry.menuMain.MainActivity;
+import com.example.learnenglishwordssecondtry.R;
+import com.example.learnenglishwordssecondtry.model.Word;
+import com.example.learnenglishwordssecondtry.model.WordsInProcessSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -75,6 +80,7 @@ public class LearnWordsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_set_of_words);
 

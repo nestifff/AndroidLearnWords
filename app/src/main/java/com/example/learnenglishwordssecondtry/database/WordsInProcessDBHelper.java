@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.learnenglishwordssecondtry.Word;
+import com.example.learnenglishwordssecondtry.model.Word;
 import com.example.learnenglishwordssecondtry.database.WordsInProcessDB.WordsInProcessTable;
 
 public class WordsInProcessDBHelper extends SQLiteOpenHelper {
@@ -68,7 +68,7 @@ public class WordsInProcessDBHelper extends SQLiteOpenHelper {
             addWord(new Word("disparity", "неравенство"));
             addWord(new Word("sophisticated", "сложный"));
             addWord(new Word("implementation", "реализация"));
-            addWord(new Word("eventually", "в конце концов"));
+            /*addWord(new Word("eventually", "в конце концов"));
             addWord(new Word("repeatedly", "неоднократно"));
 
             addWord(new Word("nascent", "возникающий"));
@@ -80,7 +80,7 @@ public class WordsInProcessDBHelper extends SQLiteOpenHelper {
             addWord(new Word("traversing", "перемещение"));
             addWord(new Word("incrementally", "пошагово"));
             addWord(new Word("ambit", "в пределах"));
-            addWord(new Word("dashed line", "пунктирная линия"));
+            addWord(new Word("dashed line", "пунктирная линия"));*/
         }
     }
 }
