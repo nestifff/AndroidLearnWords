@@ -6,7 +6,7 @@ package com.example.learnenglishwordssecondtry.database;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
-import com.example.learnenglishwordssecondtry.Word;
+import com.example.learnenglishwordssecondtry.model.Word;
 import com.example.learnenglishwordssecondtry.database.WordsInProcessDB.WordsInProcessTable;
 
 import java.util.UUID;

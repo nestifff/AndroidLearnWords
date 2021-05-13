@@ -1,6 +1,7 @@
-package com.example.learnenglishwordssecondtry;
+package com.example.learnenglishwordssecondtry.model;
 
 import java.lang.Comparable;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Word implements Comparable<Word> {
@@ -107,5 +108,18 @@ public class Word implements Comparable<Word> {
         return wordID;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Word word = (Word) o;
+        return Objects.equals(wordEng, word.wordEng) &&
+                Objects.equals(wordRus, word.wordRus) &&
+                wordID.equals(word.wordID);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(wordEng, wordRus, wordID);
+    }
 }

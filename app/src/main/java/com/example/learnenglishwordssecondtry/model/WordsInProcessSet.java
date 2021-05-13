@@ -1,4 +1,4 @@
-package com.example.learnenglishwordssecondtry;
+package com.example.learnenglishwordssecondtry.model;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -23,6 +23,8 @@ public class WordsInProcessSet {
 
     private Context mContext;
     private SQLiteDatabase mDatabase;
+
+    private List<Word> wordsList;
 
     public static WordsInProcessSet get(Context context) {
         if (wordsInProcessSetObj == null) {
@@ -56,17 +58,25 @@ public class WordsInProcessSet {
         mDatabase = new WordsInProcessDBHelper(mContext).getWritableDatabase();
     }
 
-    public void addWord(Word word) {
+    public boolean addWord(Word word) {
 
+        if (wordsList.contains(word)) {
+            return false;
+        }
         ContentValues values = getContentValues(word);
         mDatabase.insert(WordsInProcessTable.NAME, null, values);
+        wordsList.add(word);
+
+        return true;
     }
 
     public void deleteWord(Word word) {
+
         String uuidString = word.getID().toString();
         mDatabase.delete(WordsInProcessTable.NAME,
                 WordsInProcessTable.Cols.UUID + " = ?",
                 new String[]{uuidString});
+        wordsList.remove(word);
     }
 
     public void updateWord(Word word) {
@@ -77,6 +87,15 @@ public class WordsInProcessSet {
         mDatabase.update(WordsInProcessTable.NAME, values,
                 WordsInProcessTable.Cols.UUID + " = ?",
                 new String[]{uuidString});
+
+        if (wordsList != null) {
+            for (Word w : wordsList) {
+                if (w.getID().equals(word.getID())) {
+                    w.wordRus = word.wordRus;
+                    w.wordEng = word.wordEng;
+                }
+            }
+        }
 
     }
 
@@ -102,16 +121,17 @@ public class WordsInProcessSet {
 
     public List<Word> getWords(int count) throws Exception {
 
+
         List<Word> words = new ArrayList<>();
         WordCursorWrapper cursor = queryWords(null, null);
 
         int numInBD = cursor.getCount();
         if (numInBD == 0) {
-            throw  new Exception("No items in wordsInProcessDB");
+            throw new Exception("No items in wordsInProcessDB");
         }
 
-        if (count > numInBD) {
-            count = numInBD;
+        if (count >= numInBD) {
+            return getAllWords();
         }
 
         // indexes of randomly chosen words
@@ -154,7 +174,11 @@ public class WordsInProcessSet {
         return words;
     }
 
-    public List<Word> getWords() {
+    public List<Word> getAllWords() {
+
+        if (wordsList != null) {
+            return wordsList;
+        }
 
         List<Word> words = new ArrayList<>();
         WordCursorWrapper cursor = queryWords(null, null);
@@ -171,11 +195,21 @@ public class WordsInProcessSet {
             cursor.close();
         }
 
+        wordsList = words;
         return words;
     }
 
     public void deleteAllWords() {
         mDatabase.delete(WordsInProcessTable.NAME, null, null);
+        wordsList.clear();
+    }
+
+    public int getWordsNum() {
+
+        if (wordsList == null) {
+            wordsList = getAllWords();
+        }
+        return wordsList.size();
     }
 
 }
@@ -245,7 +279,7 @@ public class WordsInProcessSet {
         addWord(new Word("in either case", "В любом случае"));
         addWord(new Word("error rate", "частота ошибок"));
 */
-    //}
+//}
 
     /*private void addToList() {
 
