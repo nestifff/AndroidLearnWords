@@ -36,7 +36,7 @@ object WordsInFromFile {
 
     }
 
-    fun pullWordsInProcessFromFile(): List<Word> {
+    fun pullWordsInProcessFromFile(): MutableList<Word> {
 
         val words = mutableListOf<Word>()
         val rootPath: String = Environment.getExternalStorageDirectory()

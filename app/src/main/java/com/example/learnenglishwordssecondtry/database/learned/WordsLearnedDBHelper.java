@@ -1,11 +1,9 @@
 package com.example.learnenglishwordssecondtry.database.learned;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.learnenglishwordssecondtry.model.WordLearned;
 
 public class WordsLearnedDBHelper extends SQLiteOpenHelper {
 
@@ -25,8 +23,6 @@ public class WordsLearnedDBHelper extends SQLiteOpenHelper {
                 WordsLearnedDB.WordsLearnedTable.Cols.RUS + ")"
         );
 
-        WordsLearnedDBHelper.StartPlaceholder placeholder = new WordsLearnedDBHelper.StartPlaceholder(db);
-
     }
 
     @Override
@@ -36,30 +32,5 @@ public class WordsLearnedDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
-    private class StartPlaceholder {
-
-        private SQLiteDatabase mDatabase;
-
-        public StartPlaceholder(SQLiteDatabase db) {
-            mDatabase = db;
-        }
-
-        public ContentValues getContentValues(WordLearned word) {
-            ContentValues values = new ContentValues();
-
-            values.put(WordsLearnedDB.WordsLearnedTable.Cols.UUID, word.id.toString());
-            values.put(WordsLearnedDB.WordsLearnedTable.Cols.ENG, word.eng);
-            values.put(WordsLearnedDB.WordsLearnedTable.Cols.RUS, word.rus);
-
-            return values;
-        }
-
-        public void addWord(WordLearned word) {
-
-            ContentValues values = getContentValues(word);
-            mDatabase.insert(WordsLearnedDB.WordsLearnedTable.NAME, null, values);
-        }
-    }
 
 }

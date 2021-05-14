@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -79,6 +80,9 @@ class WordsListActivity :
 
         isShowLearned = intent.getBooleanExtra(LEARNED_OR_IN_PROCESS, false)
 
+        val textTypeSet = if (isShowLearned) "Learned Words" else "Words In Process"
+        findViewById<TextView>(R.id.tv_type_of_set_to_view).text = textTypeSet
+
         if (!isShowLearned) {
             currWordsSet = ArrayList(SetWordsInProcess
                     .get(applicationContext).allWords)
@@ -87,6 +91,7 @@ class WordsListActivity :
             currWordsSet = ArrayList(SetWordsLearned.get(applicationContext).allWords)
             currWordsSet.sortBy { it.rus }
         }
+        findViewById<TextView>(R.id.tv_size_words_set).text = "Amount: " + currWordsSet.size
 
         wordsSetRecyclerView = findViewById(R.id.view_set_recyclerView)
         layoutManager = LinearLayoutManager(this)
@@ -162,22 +167,18 @@ class WordsListActivity :
 
     }
 
-    private fun addWordsIntoCurrWordsSet(newWords: List<Word>) {
+    private fun addWordsIntoCurrWordsSet(newWords: MutableList<Word>) {
 
         for (newWord: Word in newWords) {
 
             if (!currWordsSet.any {
-                        it.rus == newWord.rus &&
-                                it.eng == newWord.eng
+                        it.rus == newWord.rus && it.eng == newWord.eng
                     }) {
 
                 currWordsSet.add(newWord)
-                if (newWord is WordInProcess) {
-                    SetWordsInProcess.get(applicationContext).addWord(newWord)
-                }
+                SetWordsInProcess.get(applicationContext).addWord(newWord as WordInProcess)
             }
         }
-
         currWordsSet.sortBy { it.rus }
 
         val listOfIndexes: MutableList<Int> = mutableListOf()
@@ -189,7 +190,7 @@ class WordsListActivity :
 
         (adapter as WordsListAdapter).wordsSet = currWordsSet
         for (ind in listOfIndexes) {
-           adapter?.notifyItemInserted(ind)
+            adapter?.notifyItemInserted(ind)
         }
     }
 }

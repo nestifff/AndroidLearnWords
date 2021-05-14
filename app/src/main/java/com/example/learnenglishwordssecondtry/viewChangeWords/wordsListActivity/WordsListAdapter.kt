@@ -4,9 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.learnenglishwordssecondtry.R
 import com.example.learnenglishwordssecondtry.model.*
+import com.google.android.material.snackbar.Snackbar
+
 
 class WordsListAdapter(
         var wordsSet: MutableList<Word>?,
@@ -63,7 +66,7 @@ class WordsListAdapter(
         if (word is WordInProcess) {
             SetWordsInProcess.get(context).deleteWord(word)
 
-        } else if (word is WordLearned){
+        } else if (word is WordLearned) {
             SetWordsLearned.get(context).deleteWord(word)
         }
 
@@ -73,7 +76,38 @@ class WordsListAdapter(
         setEmptyViewVisibility()
         notifyItemRemoved(position)
 
+        launchSnackbarToRestoreWord(word, position)
     }
 
+    private fun launchSnackbarToRestoreWord(word: Word, position: Int) {
+
+        if (view == null) return
+
+        val snackbar: Snackbar = Snackbar.make(
+                view!!,
+                "Deleted word: ${word.rus} - ${word.eng}",
+                Snackbar.LENGTH_SHORT
+        )
+        snackbar.setAction("Undo") { view ->
+            if (view != null) {
+                wordsSet!!.add(word)
+
+                wordsSet?.sortBy { it.rus }
+
+                setEmptyViewVisibility()
+                notifyItemInserted(position)
+
+                if (word is WordInProcess) {
+                    SetWordsInProcess.get(context).addWord(word)
+
+                } else if (word is WordLearned) {
+                    SetWordsLearned.get(context).addWord(word)
+                }
+            }
+        }
+        snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
+        snackbar.show()
+
+    }
 
 }

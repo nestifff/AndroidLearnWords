@@ -27,9 +27,6 @@ public class WordsInProcessDBHelper extends SQLiteOpenHelper {
                 WordsInProcessTable.Cols.NUM_ON_FIRST_TRY + ")"
         );
 
-        StartPlaceholder placeholder = new StartPlaceholder(db);
-        placeholder.fillDBWithStartWords();
-
     }
 
     @Override
@@ -39,50 +36,4 @@ public class WordsInProcessDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-
-    private class StartPlaceholder {
-
-        private SQLiteDatabase mDatabase;
-
-        public StartPlaceholder(SQLiteDatabase db) {
-            mDatabase = db;
-        }
-
-        public ContentValues getContentValues (WordInProcess word) {
-            ContentValues values = new ContentValues();
-
-            values.put(WordsInProcessTable.Cols.UUID, word.id.toString());
-            values.put(WordsInProcessTable.Cols.ENG, word.eng);
-            values.put(WordsInProcessTable.Cols.RUS, word.rus);
-            values.put(WordsInProcessTable.Cols.NUM_ON_FIRST_TRY, word.numOnFirstTry);
-
-            return values;
-        }
-
-        public void addWord(WordInProcess word) {
-
-            ContentValues values = getContentValues(word);
-            mDatabase.insert(WordsInProcessTable.NAME, null, values);
-        }
-
-        public void fillDBWithStartWords() {
-
-            addWord(new WordInProcess("disparity", "неравенство"));
-            addWord(new WordInProcess("sophisticated", "сложный"));
-            addWord(new WordInProcess("implementation", "реализация"));
-            /*addWord(new Word("eventually", "в конце концов"));
-            addWord(new Word("repeatedly", "неоднократно"));
-
-            addWord(new Word("nascent", "возникающий"));
-            addWord(new Word("comprise", "содержать в себе"));
-            addWord(new Word("shrink", "сокращаться"));
-            addWord(new Word("enormous", "огромный"));
-
-            addWord(new Word("preserve", "сохранять"));
-            addWord(new Word("traversing", "перемещение"));
-            addWord(new Word("incrementally", "пошагово"));
-            addWord(new Word("ambit", "в пределах"));
-            addWord(new Word("dashed line", "пунктирная линия"));*/
-        }
-    }
 }
