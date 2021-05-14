@@ -13,8 +13,6 @@ import com.example.learnenglishwordssecondtry.learnWords.ChooseSetToLearnActivit
 import com.example.learnenglishwordssecondtry.viewChangeWords.ChooseSetToViewActivity;
 
 
-//chose what to do, first window
-
 public class MainActivity extends AppCompatActivity {
 
     private Button recallWordsButton;
@@ -33,14 +31,15 @@ public class MainActivity extends AppCompatActivity {
         recallWordsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "This option isn't available", Toast.LENGTH_SHORT).show();
+                Intent intent = ChooseSetToLearnActivity.newIntent(MainActivity.this, false);
+                startActivity(intent);
             }
         });
 
         learnWordsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ChooseSetToLearnActivity.class);
+                Intent intent = ChooseSetToLearnActivity.newIntent(MainActivity.this, true);
                 startActivity(intent);
             }
         });

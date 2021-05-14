@@ -1,41 +1,32 @@
 package com.example.learnenglishwordssecondtry.model;
 
-import java.lang.Comparable;
-import java.util.Objects;
 import java.util.UUID;
 
 public class Word implements Comparable<Word> {
 
-    public String wordEng;
-    public String wordRus;
-    private UUID wordID;
+    public String eng;
+    public String rus;
+    public UUID id;
 
-    public Word (String eng, String rus) {
-        wordEng = eng;
-        wordRus = rus;
-        wordID = UUID.randomUUID();
+    protected Word(String eng, String rus) {
+        this.eng = eng;
+        this.rus = rus;
+        id = UUID.randomUUID();
     }
 
-    public Word() {
-        wordEng = "-";
-        wordRus = "-";
+    protected Word(UUID id, String eng, String rus) {
+        this.eng = eng;
+        this.rus = rus;
+        this.id = id;
     }
-
-    public Word (UUID id, String eng, String rus) {
-        wordEng = eng;
-        wordRus = rus;
-        wordID = id;
-    }
-
 
     public boolean isCorrect(boolean rusEngWay, String tryAns) {
-
         String rightAns;
 
         if (rusEngWay) {
-            rightAns = wordEng;
+            rightAns = eng;
         } else {
-            rightAns = wordRus;
+            rightAns = rus;
         }
 
         rightAns = rightAns.toLowerCase();
@@ -93,33 +84,13 @@ public class Word implements Comparable<Word> {
 
     public String getAnswer(boolean rusEngWay) {
         if (rusEngWay) {
-            return wordEng;
+            return eng;
         }
-        return wordRus;
+        return rus;
     }
 
-
+    @Override
     public int compareTo(Word w) {
-
-        return this.wordEng.compareToIgnoreCase(w.wordEng);
-    }
-
-    public UUID getID() {
-        return wordID;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Word word = (Word) o;
-        return Objects.equals(wordEng, word.wordEng) &&
-                Objects.equals(wordRus, word.wordRus) &&
-                wordID.equals(word.wordID);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(wordEng, wordRus, wordID);
+        return this.eng.compareToIgnoreCase(w.eng);
     }
 }

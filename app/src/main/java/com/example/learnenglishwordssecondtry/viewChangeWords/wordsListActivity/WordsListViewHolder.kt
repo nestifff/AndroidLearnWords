@@ -7,6 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.learnenglishwordssecondtry.R
 import com.example.learnenglishwordssecondtry.model.Word
+import com.example.learnenglishwordssecondtry.model.WordInProcess
+import com.example.learnenglishwordssecondtry.model.WordLearned
 import com.example.learnenglishwordssecondtry.viewChangeWords.ChangeWordClickHandler
 
 class WordsListViewHolder(

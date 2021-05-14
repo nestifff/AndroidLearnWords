@@ -6,8 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.learnenglishwordssecondtry.R
-import com.example.learnenglishwordssecondtry.model.Word
-import com.example.learnenglishwordssecondtry.model.WordsInProcessSet
+import com.example.learnenglishwordssecondtry.model.*
 
 class WordsListAdapter(
         var wordsSet: MutableList<Word>?,
@@ -35,9 +34,9 @@ class WordsListAdapter(
         holder.changeWordHandler?.setWord(word)
 
         val rusTextView = holder.rusTextView
-        rusTextView.text = word.wordRus + " - "
+        rusTextView.text = word.rus + " - "
         val endTextView = holder.engTextView
-        endTextView.text = word.wordEng
+        endTextView.text = word.eng
     }
 
     override fun getItemCount() = wordsSet?.size ?: 0
@@ -61,13 +60,19 @@ class WordsListAdapter(
 
     override fun deleteButtonOnClick(word: Word) {
 
-        WordsInProcessSet.get(context).deleteWord(word)
+        if (word is WordInProcess) {
+            SetWordsInProcess.get(context).deleteWord(word)
+
+        } else if (word is WordLearned){
+            SetWordsLearned.get(context).deleteWord(word)
+        }
 
         val position = wordsSet!!.indexOf(word)
         wordsSet!!.remove(word)
 
         setEmptyViewVisibility()
         notifyItemRemoved(position)
+
     }
 
 

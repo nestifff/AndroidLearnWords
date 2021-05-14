@@ -17,8 +17,11 @@ import android.widget.Toast;
 
 import com.example.learnenglishwordssecondtry.menuMain.MainActivity;
 import com.example.learnenglishwordssecondtry.R;
+import com.example.learnenglishwordssecondtry.model.SetWordsInProcess;
+import com.example.learnenglishwordssecondtry.model.SetWordsLearned;
 import com.example.learnenglishwordssecondtry.model.Word;
-import com.example.learnenglishwordssecondtry.model.WordsInProcessSet;
+import com.example.learnenglishwordssecondtry.model.WordInProcess;
+import com.example.learnenglishwordssecondtry.model.WordLearned;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,10 +33,6 @@ import java.util.Random;
 
 public class LearnWordsActivity extends AppCompatActivity {
 
-    /*
-    Комммент просто чтобы был
-     */
-
     private static final String TAG = "LearnWordsActivity";
     private static final String WORD_INDEX = "index";
 
@@ -41,7 +40,7 @@ public class LearnWordsActivity extends AppCompatActivity {
     public List<Word> words;
 
     private static final String WORD_COUNT = "wordCount";
-
+    private static final String LEARN_OR_RECALL = "learnOrRecall";
     private static final String WAY = "wayToLearnIsRusEng";
 
     private EditText answerEditText;
@@ -51,6 +50,8 @@ public class LearnWordsActivity extends AppCompatActivity {
     private TextView wordsRemainText;
 
     public boolean rusEngWay;
+    public boolean isInProcess;
+
     private Word lastWord;
     private int curWordInd;
 
@@ -60,22 +61,27 @@ public class LearnWordsActivity extends AppCompatActivity {
     private int wordCount;
 
 
-    public static Intent newIntent (Context packageContext, boolean aRusEngWay, int aWordCount) {
+    public static Intent newIntent(
+            Context packageContext,
+            boolean aRusEngWay,
+            int aWordCount,
+            boolean isLearnInProcess
+    ) {
 
         Intent intent = new Intent(packageContext, LearnWordsActivity.class);
         intent.putExtra(WORD_COUNT, aWordCount);
         intent.putExtra(WAY, aRusEngWay);
+        intent.putExtra(LEARN_OR_RECALL, isLearnInProcess);
 
         return intent;
     }
 
     @Override
-    protected void onSaveInstanceState (Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState) {
 
         super.onSaveInstanceState(outState);
         Log.i(TAG, "onSaveInstanceState");
         outState.putInt(WORD_INDEX, curWordInd);
-
     }
 
     @Override
@@ -100,6 +106,7 @@ public class LearnWordsActivity extends AppCompatActivity {
             resText = findViewById(R.id.text_resultsTemporary);
 
             rusEngWay = getIntent().getBooleanExtra(WAY, false);
+            isInProcess = getIntent().getBooleanExtra(LEARN_OR_RECALL, false);
 
             if (rusEngWay) {
                 wayToLearnText.setText(getString(R.string.text_rusEngWayToLearn));
@@ -107,7 +114,6 @@ public class LearnWordsActivity extends AppCompatActivity {
             } else {
                 wayToLearnText.setText(getString(R.string.text_engRusWayToLearn));
                 answerEditText.setHint(getString(R.string.textHint_enterAnswerEngRus));
-
             }
 
             wordsQAttempts = new HashMap<>();
@@ -175,7 +181,11 @@ public class LearnWordsActivity extends AppCompatActivity {
                     if (words.size() != 0) {
                         askWord(true);
                     } else {
-                        goToResults();
+                        if (isInProcess) {
+                            goToResultsInProcess();
+                        } else {
+                            goToResultsLearned();
+                        }
                         Toast.makeText(LearnWordsActivity.this, "You are win!", Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -210,7 +220,12 @@ public class LearnWordsActivity extends AppCompatActivity {
 
     private void createSet() throws Exception {
 
-        words = WordsInProcessSet.get(this).getWords(wordCount);
+        if (isInProcess) {
+            words = SetWordsInProcess.get(this).getWords(wordCount);
+        } else {
+            words = SetWordsLearned.get(this).getWords(wordCount);
+        }
+
 
         for (Word w : words) {
             wordsQAttempts.put(w, 0);
@@ -239,9 +254,9 @@ public class LearnWordsActivity extends AppCompatActivity {
         lastWord = words.get(curWordInd);
 
         if (rusEngWay) {
-            wordToRecallText.setText(lastWord.wordRus);
+            wordToRecallText.setText(lastWord.rus);
         } else {
-            wordToRecallText.setText(lastWord.wordEng);
+            wordToRecallText.setText(lastWord.eng);
         }
 
     }
@@ -278,49 +293,124 @@ public class LearnWordsActivity extends AppCompatActivity {
         return sortedMap;
     }
 
-    void goToResults() {
+    void goToResultsInProcess() {
 
         answerEditText.setEnabled(false);
 
         LinkedHashMap<Word, Integer> sortedResults = sortHashMapByValues(wordsQAttempts);
         List<Word> listWords = new ArrayList<>(sortedResults.keySet());
-        List<Integer> listAttempts = new ArrayList<>(sortedResults.values());
+        List<Integer> listAttemptsNum = new ArrayList<>(sortedResults.values());
+        List<Integer> listOnFirstTryInds = new ArrayList<>();
 
-        String text = new String();
+        String text = "";
         int onTheFirstTry = 0;
 
-        for (int i = 0; i < listAttempts.size(); ++i) {
-            if (listAttempts.get(i) != 1) {
+        for (int i = 0; i < listAttemptsNum.size(); ++i) {
+            if (listAttemptsNum.get(i) != 1) {
                 break;
             }
             ++onTheFirstTry;
+            listOnFirstTryInds.add(i);
         }
 
         text += "On the first try " + onTheFirstTry + " words / " + wordCount + "\n" + "\n";
 
-        for (int i = 1; i <= 5; ++i) {
-            if ((listAttempts.get(listWords.size() - i) != 1) && i == 1) {
+        for (int i = 1; i <= listAttemptsNum.size(); ++i) {
+            if ((listAttemptsNum.get(listWords.size() - i) != 1) && i == 1) {
                 text += "The most difficult words: \n";
             }
-            if (listAttempts.get(listWords.size() - i) == 1) {
+            if (listAttemptsNum.get(listWords.size() - i) == 1) {
                 break;
             }
-            text += listWords.get(listWords.size() - i).wordEng + " - " +
-                    listWords.get(listWords.size() - i).wordRus + ": " +
-                    listAttempts.get(listWords.size() - i) + "\n";
+            text += listWords.get(listWords.size() - i).eng + " - " +
+                    listWords.get(listWords.size() - i).rus + ": " +
+                    listAttemptsNum.get(listWords.size() - i) + "\n";
         }
 
         int numOfAttempts = 0;
-        for (Integer n : listAttempts) {
+        for (Integer n : listAttemptsNum) {
             numOfAttempts += n;
         }
 
+        List<Word> movedInLearned = setNumOnFirstTryInProcess(listWords, listOnFirstTryInds);
+
         text += "\n";
 
-        double av = (double)numOfAttempts / (double)listWords.size();
+        double av = (double) numOfAttempts / (double) listWords.size();
+        text += "Average number of attempts for one word is " + av + "\n";
+
+        if (movedInLearned.size() != 0) {
+            text += "in learned moved next words: \n";
+            for(Word word : movedInLearned) {
+                text += word.rus + " - " + word.eng + "\n";
+            }
+        }
+
+        resText.setText(text);
+    }
+
+    void goToResultsLearned() {
+
+        answerEditText.setEnabled(false);
+
+        LinkedHashMap<Word, Integer> sortedResults = sortHashMapByValues(wordsQAttempts);
+        List<Word> listWords = new ArrayList<>(sortedResults.keySet());
+        List<Integer> listAttemptsNum = new ArrayList<>(sortedResults.values());
+        List<Integer> listNotOnFirstTryInds = new ArrayList<>();
+
+        String text = new String();
+        int notOnTheFirstTry = 0;
+
+        for (int i = 0; i < listAttemptsNum.size(); ++i) {
+            if (listAttemptsNum.get(i) != 1) {
+                ++notOnTheFirstTry;
+                listNotOnFirstTryInds.add(i);
+            }
+        }
+
+        text += "Not on the first try " + notOnTheFirstTry + " words / " + wordCount + "\n" + "\n";
+
+        for (int i = 0; i < listNotOnFirstTryInds.size(); ++i) {
+            int ind = listNotOnFirstTryInds.get(i);
+            text += listWords.get(ind).rus + " - " + listWords.get(ind).eng + "\n";
+        }
+
+        int numOfAttempts = 0;
+        for (Integer n : listAttemptsNum) {
+            numOfAttempts += n;
+        }
+
+        moveNotOnFirstTryLearned(listWords, listNotOnFirstTryInds);
+
+        text += "\n";
+
+        double av = (double) numOfAttempts / (double) listWords.size();
         text += "Average number of attempts for one word is " + av + "\n";
 
         resText.setText(text);
+    }
+
+    // inds.get(i) соотвествует words.get(i)
+    private List<Word> setNumOnFirstTryInProcess(List<Word> words,
+                                                 List<Integer> inds) {
+
+        List<Word> movedToLearned = new ArrayList<>();
+
+        for (int ind : inds) {
+            if (SetWordsInProcess.get(getApplicationContext()).addNumOnFirstTry((WordInProcess) words.get(ind))) {
+                movedToLearned.add((WordInProcess) words.get(ind));
+            }
+        }
+
+        return movedToLearned;
+    }
+
+    private void moveNotOnFirstTryLearned(List<Word> words,
+                                                List<Integer> inds) {
+
+        for (int ind : inds) {
+            SetWordsLearned.get(this).moveToInProcess((WordLearned)words.get(ind));
+        }
     }
 
 

@@ -1,19 +1,9 @@
 package com.example.learnenglishwordssecondtry.model
 
-import android.app.Activity
-import android.content.pm.PackageManager
 import android.os.Environment
-import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import java.io.*
 
 object WordsInFromFile {
-
-    // Manifest.permission.WRITE_EXTERNAL_STORAGE
-    // Manifest.permission.WRITE_EXTERNAL_STORAGE
 
     fun pushWordsInFile(words: List<Word>) {
 
@@ -21,12 +11,19 @@ object WordsInFromFile {
             val rootPath: String = Environment.getExternalStorageDirectory()
                     .absolutePath.toString() + "/Documents/"
 
-            val f = File(rootPath + "pushedWords.txt")
+            val fileName =
+                    when (words[0]) {
+                        is WordInProcess -> "pushedWordsInProcess.txt"
+                        is WordLearned -> "pushedWordsLearned.txt"
+                        else -> ""
+                    }
+
+            val f = File(rootPath + fileName)
             f.createNewFile()
             val out = FileOutputStream(f)
 
             for (word: Word in words) {
-                out.write((word.wordRus + ", " + word.wordEng + "\n").toByteArray())
+                out.write((word.rus + ", " + word.eng + "\n").toByteArray())
             }
 
             out.flush()
@@ -39,13 +36,14 @@ object WordsInFromFile {
 
     }
 
-    fun pullWordsFromFile(): List<Word> {
+    fun pullWordsInProcessFromFile(): List<Word> {
 
         val words = mutableListOf<Word>()
         val rootPath: String = Environment.getExternalStorageDirectory()
                 .absolutePath.toString() + "/Documents/"
 
-        val file = File(rootPath + "pullWords.txt")
+        val fileName = "pullWords.txt"
+        val file = File(rootPath + fileName)
 
         try {
 
@@ -55,9 +53,9 @@ object WordsInFromFile {
             var line: String?
 
             while (br.readLine().also { line = it } != null) {
-                rus = line?.let {it.split(",".toRegex(), 0)[0].trim()}
-                eng = line?.let {it.split(",".toRegex(), 0)[1].trim()}
-                words.add(Word(eng, rus))
+                rus = line?.let { it.split(",".toRegex(), 0)[0].trim() }
+                eng = line?.let { it.split(",".toRegex(), 0)[1].trim() }
+                words.add(WordInProcess(eng, rus))
             }
             br.close()
 
@@ -72,31 +70,11 @@ object WordsInFromFile {
     private fun writeAllWords(words: List<Word>, out: FileOutputStream) {
 
         for (word: Word in words) {
-            out.write((word.wordRus + ", " + word.wordEng + "\n").toByteArray())
+            out.write((word.rus + ", " + word.eng + "\n").toByteArray())
         }
 
         out.flush()
         out.close()
     }
 
-    private suspend fun askPermission(
-            permission: String,
-            activity: Activity): Boolean {
-
-        if (ContextCompat.checkSelfPermission(activity, permission) !=
-                PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(activity, "permission \"$permission\" requested", Toast.LENGTH_SHORT).show()
-
-            coroutineScope {
-                launch {
-                    ActivityCompat.requestPermissions(activity, arrayOf(permission), 1)
-                }
-            }
-
-            return ContextCompat.checkSelfPermission(activity, permission) ==
-                    PackageManager.PERMISSION_GRANTED
-
-        }
-        return true
-    }
 }

@@ -1,4 +1,4 @@
-package com.example.learnenglishwordssecondtry.database;
+package com.example.learnenglishwordssecondtry.database.inProcess;
 
 // Cursor класс не слишком удобен для работы с данными талицы
 // поэтому впихнем всю жуть сюда и будем пользоваться как будто так и надо
@@ -6,23 +6,25 @@ package com.example.learnenglishwordssecondtry.database;
 import android.database.Cursor;
 import android.database.CursorWrapper;
 
-import com.example.learnenglishwordssecondtry.model.Word;
-import com.example.learnenglishwordssecondtry.database.WordsInProcessDB.WordsInProcessTable;
+import com.example.learnenglishwordssecondtry.model.WordInProcess;
+import com.example.learnenglishwordssecondtry.database.inProcess.WordsInProcessDB.WordsInProcessTable;
 
 import java.util.UUID;
 
-public class WordCursorWrapper extends CursorWrapper {
+public class WordInProcessCursorWrapper extends CursorWrapper {
 
-    public WordCursorWrapper (Cursor cursor) {
+    public WordInProcessCursorWrapper(Cursor cursor) {
         super(cursor);
     }
 
-    public Word getWord () {
+    public WordInProcess getWord () {
 
         String uuid = getString(getColumnIndex(WordsInProcessTable.Cols.UUID));
         String eng = getString(getColumnIndex(WordsInProcessTable.Cols.ENG));
         String rus = getString(getColumnIndex(WordsInProcessTable.Cols.RUS));
+        int numOnFirstTry = getInt(getColumnIndex(WordsInProcessTable.Cols.NUM_ON_FIRST_TRY));
 
-        return new Word(UUID.fromString(uuid), eng, rus);
+        WordInProcess word = new WordInProcess(UUID.fromString(uuid), eng, rus, numOnFirstTry);
+        return word;
     }
 }

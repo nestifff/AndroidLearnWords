@@ -13,37 +13,37 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.learnenglishwordssecondtry.R
-import com.example.learnenglishwordssecondtry.model.Utils
 import com.example.learnenglishwordssecondtry.model.Word
-import com.example.learnenglishwordssecondtry.model.WordsInFromFile.pullWordsFromFile
+import com.example.learnenglishwordssecondtry.model.WordInProcess
+import com.example.learnenglishwordssecondtry.model.WordsInFromFile.pullWordsInProcessFromFile
 import com.example.learnenglishwordssecondtry.model.WordsInFromFile.pushWordsInFile
-import com.example.learnenglishwordssecondtry.model.WordsInProcessSet
+import com.example.learnenglishwordssecondtry.model.SetWordsInProcess
+import com.example.learnenglishwordssecondtry.model.SetWordsLearned
 import com.example.learnenglishwordssecondtry.viewChangeWords.AddWordDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.*
+import kotlin.collections.ArrayList
 
 class WordsListActivity :
         AppCompatActivity(), AddWordDialogFragment.AddWordDialogListener {
 
-    private val learnedShowIdentifier = "isItNecessaryToShowLearnedWords"
+    private val LEARNED_OR_IN_PROCESS = "isItNecessaryToShowLearnedWords"
     private var isShowLearned = false
 
     private var wordsSetRecyclerView: RecyclerView? = null
     private var layoutManager: RecyclerView.LayoutManager? = null
     private var adapter: RecyclerView.Adapter<WordsListViewHolder>? = null
-    private var currWordsSet: MutableList<Word>? = null
+    private lateinit var currWordsSet: MutableList<Word>
 
     private val dialogAddWordIdentifier = "DialogAddWord"
-
-    private val scope = CoroutineScope(Dispatchers.Main)
 
     private val pushWordsLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()
             ) { isGranted: Boolean ->
                 if (isGranted) {
 
-                    pushWordsInFile(currWordsSet!!)
+                    pushWordsInFile(currWordsSet)
                     Toast.makeText(this, "You grant permission", Toast.LENGTH_LONG).show()
 
                 } else {
@@ -56,7 +56,7 @@ class WordsListActivity :
             ) { isGranted: Boolean ->
                 if (isGranted) {
 
-                    val words = pullWordsFromFile()
+                    val words = pullWordsInProcessFromFile()
                     addWordsIntoCurrWordsSet(words)
                     Toast.makeText(this, "You grant permission", Toast.LENGTH_LONG).show()
 
@@ -68,7 +68,7 @@ class WordsListActivity :
 
     fun newIntent(packageContext: Context?, isItNecessaryToShowLearnedWords: Boolean): Intent {
         val intent = Intent(packageContext, WordsListActivity::class.java)
-        intent.putExtra(learnedShowIdentifier, isItNecessaryToShowLearnedWords)
+        intent.putExtra(LEARNED_OR_IN_PROCESS, isItNecessaryToShowLearnedWords)
         return intent
     }
 
@@ -77,12 +77,15 @@ class WordsListActivity :
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_set_of_words)
 
-        isShowLearned = intent.getBooleanExtra(learnedShowIdentifier, false)
+        isShowLearned = intent.getBooleanExtra(LEARNED_OR_IN_PROCESS, false)
 
         if (!isShowLearned) {
-            currWordsSet = ArrayList(WordsInProcessSet
+            currWordsSet = ArrayList(SetWordsInProcess
                     .get(applicationContext).allWords)
-            Utils.sortWordsByRus(currWordsSet)
+            currWordsSet.sortBy { it.rus }
+        } else {
+            currWordsSet = ArrayList(SetWordsLearned.get(applicationContext).allWords)
+            currWordsSet.sortBy { it.rus }
         }
 
         wordsSetRecyclerView = findViewById(R.id.view_set_recyclerView)
@@ -97,9 +100,14 @@ class WordsListActivity :
     override fun onResume() {
         super.onResume()
 
-        currWordsSet = ArrayList(WordsInProcessSet
-                .get(applicationContext).allWords)
-        Utils.sortWordsByRus(currWordsSet)
+        if (!isShowLearned) {
+            currWordsSet = ArrayList(SetWordsInProcess
+                    .get(applicationContext).allWords)
+            currWordsSet.sortBy { it.rus }
+        } else {
+            currWordsSet = ArrayList(SetWordsLearned.get(applicationContext).allWords)
+            currWordsSet.sortBy { it.rus }
+        }
 
         layoutManager = LinearLayoutManager(this)
         wordsSetRecyclerView?.layoutManager = layoutManager
@@ -109,15 +117,18 @@ class WordsListActivity :
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.pm_view_words_in_process, menu)
+        if (!isShowLearned) {
+            val inflater = menuInflater
+            inflater.inflate(R.menu.pm_view_words_in_process, menu)
+        }
         return true
+
     }
 
-    override fun addWordDialogOnClick(word: Word) {
+    override fun addWordDialogOnClick(word: WordInProcess) {
 
         (adapter as WordsListAdapter).wordsSet?.add(word)
-        Utils.sortWordsByRus((adapter as WordsListAdapter).wordsSet)
+        (adapter as WordsListAdapter).wordsSet?.sortBy { it.rus }
 
         (adapter as WordsListAdapter).addWordInRV(word)
     }
@@ -155,17 +166,30 @@ class WordsListActivity :
 
         for (newWord: Word in newWords) {
 
-            if (currWordsSet?.any {
-                        it.wordRus == newWord.wordRus &&
-                                it.wordEng == newWord.wordEng
-                    } != true) {
+            if (!currWordsSet.any {
+                        it.rus == newWord.rus &&
+                                it.eng == newWord.eng
+                    }) {
 
-                currWordsSet?.add(newWord)
+                currWordsSet.add(newWord)
+                if (newWord is WordInProcess) {
+                    SetWordsInProcess.get(applicationContext).addWord(newWord)
+                }
             }
         }
 
-        Utils.sortWordsByRus(currWordsSet)
+        currWordsSet.sortBy { it.rus }
+
+        val listOfIndexes: MutableList<Int> = mutableListOf()
+        for ((index, word) in currWordsSet.withIndex()) {
+            if (newWords.contains(word)) {
+                listOfIndexes.add(index)
+            }
+        }
+
         (adapter as WordsListAdapter).wordsSet = currWordsSet
-        adapter?.notifyDataSetChanged()
+        for (ind in listOfIndexes) {
+           adapter?.notifyItemInserted(ind)
+        }
     }
 }

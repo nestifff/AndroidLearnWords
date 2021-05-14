@@ -1,12 +1,12 @@
-package com.example.learnenglishwordssecondtry.database;
+package com.example.learnenglishwordssecondtry.database.inProcess;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.learnenglishwordssecondtry.model.Word;
-import com.example.learnenglishwordssecondtry.database.WordsInProcessDB.WordsInProcessTable;
+import com.example.learnenglishwordssecondtry.model.WordInProcess;
+import com.example.learnenglishwordssecondtry.database.inProcess.WordsInProcessDB.WordsInProcessTable;
 
 public class WordsInProcessDBHelper extends SQLiteOpenHelper {
 
@@ -23,7 +23,8 @@ public class WordsInProcessDBHelper extends SQLiteOpenHelper {
                         " _id integer primary key autoincrement, " +
                 WordsInProcessTable.Cols.UUID + ", " +
                 WordsInProcessTable.Cols.ENG + ", " +
-                WordsInProcessTable.Cols.RUS + ")"
+                WordsInProcessTable.Cols.RUS + ", " +
+                WordsInProcessTable.Cols.NUM_ON_FIRST_TRY + ")"
         );
 
         StartPlaceholder placeholder = new StartPlaceholder(db);
@@ -47,17 +48,18 @@ public class WordsInProcessDBHelper extends SQLiteOpenHelper {
             mDatabase = db;
         }
 
-        public ContentValues getContentValues (Word word) {
+        public ContentValues getContentValues (WordInProcess word) {
             ContentValues values = new ContentValues();
 
-            values.put(WordsInProcessTable.Cols.UUID, word.getID().toString());
-            values.put(WordsInProcessTable.Cols.ENG, word.wordEng);
-            values.put(WordsInProcessTable.Cols.RUS, word.wordRus);
+            values.put(WordsInProcessTable.Cols.UUID, word.id.toString());
+            values.put(WordsInProcessTable.Cols.ENG, word.eng);
+            values.put(WordsInProcessTable.Cols.RUS, word.rus);
+            values.put(WordsInProcessTable.Cols.NUM_ON_FIRST_TRY, word.numOnFirstTry);
 
             return values;
         }
 
-        public void addWord(Word word) {
+        public void addWord(WordInProcess word) {
 
             ContentValues values = getContentValues(word);
             mDatabase.insert(WordsInProcessTable.NAME, null, values);
@@ -65,9 +67,9 @@ public class WordsInProcessDBHelper extends SQLiteOpenHelper {
 
         public void fillDBWithStartWords() {
 
-            addWord(new Word("disparity", "неравенство"));
-            addWord(new Word("sophisticated", "сложный"));
-            addWord(new Word("implementation", "реализация"));
+            addWord(new WordInProcess("disparity", "неравенство"));
+            addWord(new WordInProcess("sophisticated", "сложный"));
+            addWord(new WordInProcess("implementation", "реализация"));
             /*addWord(new Word("eventually", "в конце концов"));
             addWord(new Word("repeatedly", "неоднократно"));
 

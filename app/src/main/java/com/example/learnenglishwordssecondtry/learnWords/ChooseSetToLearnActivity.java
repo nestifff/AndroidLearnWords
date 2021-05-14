@@ -2,6 +2,7 @@ package com.example.learnenglishwordssecondtry.learnWords;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -18,11 +19,27 @@ public class ChooseSetToLearnActivity extends AppCompatActivity {
 
     private TextView wayToLearnText;
     boolean rusEngWay = true;
+    private static final String LEARN_OR_RECALL = "learnOrRecallChooseNum";
+    private boolean isLearnInProcess;
+
+
+    public static Intent newIntent(
+            Context packageContext,
+            boolean isInProcess
+    ) {
+
+        Intent intent = new Intent(packageContext, ChooseSetToLearnActivity.class);
+        intent.putExtra(LEARN_OR_RECALL, isInProcess);
+
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_set_to_learn);
+
+        isLearnInProcess = getIntent().getBooleanExtra(LEARN_OR_RECALL, false);
 
         Button learnWordsInProcess_5_Button;
         Button learnWordsInProcess_10_Button;
@@ -61,7 +78,7 @@ public class ChooseSetToLearnActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = LearnWordsActivity.newIntent(
-                        ChooseSetToLearnActivity.this, rusEngWay, 5);
+                        ChooseSetToLearnActivity.this, rusEngWay, 5, isLearnInProcess);
                 startActivity(intent);
             }
         });
@@ -70,7 +87,7 @@ public class ChooseSetToLearnActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = LearnWordsActivity.newIntent(
-                        ChooseSetToLearnActivity.this, rusEngWay, 10);
+                        ChooseSetToLearnActivity.this, rusEngWay, 10, isLearnInProcess);
                 startActivity(intent);
             }
         });
@@ -79,7 +96,7 @@ public class ChooseSetToLearnActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = LearnWordsActivity.newIntent(
-                        ChooseSetToLearnActivity.this, rusEngWay, 20);
+                        ChooseSetToLearnActivity.this, rusEngWay, 20, isLearnInProcess);
                 startActivity(intent);
             }
         });
@@ -88,7 +105,7 @@ public class ChooseSetToLearnActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = LearnWordsActivity.newIntent(
-                        ChooseSetToLearnActivity.this, rusEngWay, 30);
+                        ChooseSetToLearnActivity.this, rusEngWay, 30, isLearnInProcess);
                 startActivity(intent);
             }
         });
@@ -97,7 +114,7 @@ public class ChooseSetToLearnActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = LearnWordsActivity.newIntent(
-                        ChooseSetToLearnActivity.this, rusEngWay, 50);
+                        ChooseSetToLearnActivity.this, rusEngWay, 50, isLearnInProcess);
                 startActivity(intent);
             }
         });

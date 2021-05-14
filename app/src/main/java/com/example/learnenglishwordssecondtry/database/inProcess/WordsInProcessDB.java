@@ -1,4 +1,4 @@
-package com.example.learnenglishwordssecondtry.database;
+package com.example.learnenglishwordssecondtry.database.inProcess;
 
 public class WordsInProcessDB {
 
@@ -11,6 +11,7 @@ public class WordsInProcessDB {
             public static final String UUID = "uuid";
             public static final String ENG = "eng";
             public static final String RUS = "rus";
+            public static final String NUM_ON_FIRST_TRY = "numOfFirstTry";
 
         }
     }

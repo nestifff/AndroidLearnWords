@@ -12,8 +12,8 @@ import android.widget.EditText;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.learnenglishwordssecondtry.R;
-import com.example.learnenglishwordssecondtry.model.Word;
-import com.example.learnenglishwordssecondtry.model.WordsInProcessSet;
+import com.example.learnenglishwordssecondtry.model.SetWordsInProcess;
+import com.example.learnenglishwordssecondtry.model.WordInProcess;
 
 public class AddWordDialogFragment extends DialogFragment {
 
@@ -21,7 +21,7 @@ public class AddWordDialogFragment extends DialogFragment {
     private EditText editTextEng;
 
     public interface AddWordDialogListener {
-        void addWordDialogOnClick(Word newWord);
+        void addWordDialogOnClick(WordInProcess newWord);
     }
 
     AddWordDialogListener listener;
@@ -76,10 +76,10 @@ public class AddWordDialogFragment extends DialogFragment {
 
     private void addWordDialog() {
 
-        Word newWord = new Word(editTextEng.getText().toString(),
+        WordInProcess newWord = new WordInProcess(editTextEng.getText().toString(),
                 editTextRus.getText().toString());
 
-        WordsInProcessSet.get(getContext()).addWord(newWord);
+        SetWordsInProcess.get(getContext()).addWord(newWord);
 
         listener.addWordDialogOnClick(newWord);
     }

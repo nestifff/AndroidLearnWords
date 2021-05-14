@@ -12,8 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.learnenglishwordssecondtry.R;
+import com.example.learnenglishwordssecondtry.model.SetWordsInProcess;
 import com.example.learnenglishwordssecondtry.model.Word;
-import com.example.learnenglishwordssecondtry.model.WordsInProcessSet;
+import com.example.learnenglishwordssecondtry.model.WordInProcess;
 
 public class ChangeWordClickHandler implements View.OnClickListener {
 
@@ -34,6 +35,9 @@ public class ChangeWordClickHandler implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
+        if (!(word instanceof WordInProcess)) {
+            return;
+        }
         linearLayout = v.findViewById(R.id.linearLayout_changeWord);
         deleteWordButton = v.findViewById(R.id.button_deleteWord);
 
@@ -57,8 +61,8 @@ public class ChangeWordClickHandler implements View.OnClickListener {
         rusWordTextView = v.findViewById(R.id.textView_viewRusWord);
         engWordTextView = v.findViewById(R.id.textView_viewEngWord);
 
-        rusWordEditText.setText(word.wordRus);
-        engWordEditText.setText(word.wordEng);
+        rusWordEditText.setText(word.rus);
+        engWordEditText.setText(word.eng);
         rusWordEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
         engWordEditText.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
@@ -99,8 +103,8 @@ public class ChangeWordClickHandler implements View.OnClickListener {
             public void onClick(View v) {
                 changeWord();
 
-                rusWordTextView.setText(word.wordRus + " - ");
-                engWordTextView.setText(word.wordEng);
+                rusWordTextView.setText(word.rus + " - ");
+                engWordTextView.setText(word.eng);
 
                 linearLayout.setVisibility(View.GONE);
                 deleteWordButton.setVisibility(View.VISIBLE);
@@ -110,19 +114,20 @@ public class ChangeWordClickHandler implements View.OnClickListener {
 
     private void changeWord() {
 
-        if (!rusWordEditText.getText().toString().equals(word.wordRus) ||
-                !engWordEditText.getText().toString().equals(word.wordEng)) {
+        if (!rusWordEditText.getText().toString().equals(word.rus) ||
+                !engWordEditText.getText().toString().equals(word.eng)) {
 
-            word.wordEng = engWordEditText.getText().toString();
-            word.wordRus = rusWordEditText.getText().toString();
+            word.eng = engWordEditText.getText().toString();
+            word.rus = rusWordEditText.getText().toString();
 
-            WordsInProcessSet.get(context).updateWord(word);
+            SetWordsInProcess.get(context).updateWord((WordInProcess) word);
         }
     }
 
     public void setWord(Word word) {
         this.word = word;
     }
+
     public void setContext(Context context) {
         this.context = context;
     }

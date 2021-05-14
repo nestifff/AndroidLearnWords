@@ -19,8 +19,8 @@ class ChooseSetToViewActivity : AppCompatActivity() {
         val btnViewWordsInProcess: Button = findViewById(R.id.showWordsInProcessButton)
 
         btnViewWordsLearned.setOnClickListener {
-            Toast.makeText(this@ChooseSetToViewActivity, "This option isn't available", Toast.LENGTH_SHORT).show()
-        }
+            val intent: Intent = WordsListActivity().newIntent(this@ChooseSetToViewActivity, true)
+            startActivity(intent)        }
 
         btnViewWordsInProcess.setOnClickListener {
             val intent: Intent = WordsListActivity().newIntent(this@ChooseSetToViewActivity, false)
