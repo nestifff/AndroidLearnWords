@@ -14,7 +14,8 @@ import com.google.android.material.snackbar.Snackbar
 class WordsListAdapter(
         var wordsSet: MutableList<Word>?,
         private var view: View?,
-        val context: Context
+        val context: Context,
+        val deleteWordListener: DeleteWordOnClick
 ) : RecyclerView.Adapter<WordsListViewHolder>(), WordsListViewHolder.DeleteButtonClickListener {
 
 
@@ -76,6 +77,8 @@ class WordsListAdapter(
         setEmptyViewVisibility()
         notifyItemRemoved(position)
 
+        deleteWordListener.onDelete(word)
+
         launchSnackbarToRestoreWord(word, position)
     }
 
@@ -97,6 +100,8 @@ class WordsListAdapter(
                 setEmptyViewVisibility()
                 notifyItemInserted(position)
 
+                deleteWordListener.onRestore(word)
+
                 if (word is WordInProcess) {
                     SetWordsInProcess.get(context).addWord(word)
 
@@ -108,6 +113,11 @@ class WordsListAdapter(
         snackbar.setActionTextColor(ContextCompat.getColor(context, R.color.colorPrimary))
         snackbar.show()
 
+    }
+
+    interface DeleteWordOnClick {
+        fun onDelete(word: Word)
+        fun onRestore(word: Word)
     }
 
 }

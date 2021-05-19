@@ -21,13 +21,12 @@ import com.example.learnenglishwordssecondtry.model.WordsInFromFile.pushWordsInF
 import com.example.learnenglishwordssecondtry.model.SetWordsInProcess
 import com.example.learnenglishwordssecondtry.model.SetWordsLearned
 import com.example.learnenglishwordssecondtry.viewChangeWords.AddWordDialogFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import java.util.*
 import kotlin.collections.ArrayList
 
 class WordsListActivity :
-        AppCompatActivity(), AddWordDialogFragment.AddWordDialogListener {
+        AppCompatActivity(),
+        AddWordDialogFragment.AddWordDialogListener,
+        WordsListAdapter.DeleteWordOnClick {
 
     private val LEARNED_OR_IN_PROCESS = "isItNecessaryToShowLearnedWords"
     private var isShowLearned = false
@@ -97,7 +96,7 @@ class WordsListActivity :
         layoutManager = LinearLayoutManager(this)
         wordsSetRecyclerView?.layoutManager = layoutManager
 
-        adapter = WordsListAdapter(currWordsSet, wordsSetRecyclerView, this)
+        adapter = WordsListAdapter(currWordsSet, wordsSetRecyclerView, this, this)
         wordsSetRecyclerView?.adapter = adapter
     }
 
@@ -116,7 +115,7 @@ class WordsListActivity :
 
         layoutManager = LinearLayoutManager(this)
         wordsSetRecyclerView?.layoutManager = layoutManager
-        adapter = WordsListAdapter(currWordsSet, wordsSetRecyclerView, this)
+        adapter = WordsListAdapter(currWordsSet, wordsSetRecyclerView, this, this)
         wordsSetRecyclerView?.adapter = adapter
         adapter!!.notifyDataSetChanged()
     }
@@ -192,5 +191,15 @@ class WordsListActivity :
         for (ind in listOfIndexes) {
             adapter?.notifyItemInserted(ind)
         }
+
+        findViewById<TextView>(R.id.tv_size_words_set).text = "Amount: " + currWordsSet.size
+    }
+
+    override fun onDelete(word: Word) {
+        findViewById<TextView>(R.id.tv_size_words_set).text = "Amount: " + currWordsSet.size
+    }
+
+    override fun onRestore(word: Word) {
+        findViewById<TextView>(R.id.tv_size_words_set).text = "Amount: " + currWordsSet.size
     }
 }

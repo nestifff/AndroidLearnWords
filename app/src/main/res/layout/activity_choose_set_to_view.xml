@@ -33,13 +33,6 @@
             android:padding="24dp"
             android:text="@string/button_showWordsInProcess" />
 
-        <Button
-            android:id="@+id/btn_createTxtFromWords"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="24dp"
-            android:text="@string/create_file_with_words_in_process" />
-
 
     </LinearLayout>
 
