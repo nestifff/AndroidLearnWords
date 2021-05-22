@@ -56,7 +56,7 @@ public class ChooseSetToLearnActivity extends AppCompatActivity {
         learnWordsInProcess_50_Button = findViewById(R.id.learnWordsInProcess_50_Button);
 
         changeWayOfLearnButton = findViewById(R.id.button_changeWayToLearn);
-        wayToLearnText =  findViewById(R.id.text_wayToLearn);
+        wayToLearnText =  findViewById(R.id.tv_wayToLearnValue);
 
         changeWayOfLearnButton.setOnClickListener(new View.OnClickListener() {
 

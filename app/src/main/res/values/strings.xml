@@ -48,5 +48,6 @@
     <string name="create_file_with_words_in_process">Create file with words in process</string>
     <string name="download_all_words_in_txt_file">Download all words in txt file</string>
     <string name="add_words_from_file">Add words from file</string>
+    <string name="home"><![CDATA[< HOME]]></string>
 
 </resources>

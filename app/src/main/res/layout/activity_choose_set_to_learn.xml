@@ -74,7 +74,7 @@
                 android:text="@string/text_wayToLearnInfo" />
 
             <TextView
-                android:id="@+id/text_wayToLearn"
+                android:id="@+id/tv_wayToLearnValue"
                 android:textSize="16dp"
                 android:gravity="left"
                 android:layout_width="wrap_content"

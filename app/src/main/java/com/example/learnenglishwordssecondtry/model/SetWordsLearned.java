@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.learnenglishwordssecondtry.database.inProcess.WordInProcessCursorWrapper;
 import com.example.learnenglishwordssecondtry.database.learned.WordLearnedCursorWrapper;
 import com.example.learnenglishwordssecondtry.database.learned.WordsLearnedDB;
 import com.example.learnenglishwordssecondtry.database.learned.WordsLearnedDBHelper;
@@ -35,6 +36,7 @@ public class SetWordsLearned {
 
         mContext = context.getApplicationContext();
         mDatabase = new WordsLearnedDBHelper(mContext).getWritableDatabase();
+        wordsList = getAllWordsFromDB();
     }
 
     public boolean addWord(WordLearned word) {
@@ -61,13 +63,13 @@ public class SetWordsLearned {
 
     public void moveToInProcess(WordLearned word) {
         deleteWord(word);
+        wordsList.remove(word);
         WordInProcess newWord = new WordInProcess(word);
         SetWordsInProcess.get(mContext).addWord(newWord);
     }
 
     private WordLearnedCursorWrapper queryWords(String whereClause, String[] whereArgs) {
 
-        long numInDB = DatabaseUtils.queryNumEntries(mDatabase, WordsLearnedDB.WordsLearnedTable.NAME);
         Cursor cursor = mDatabase.query(WordsLearnedDB.WordsLearnedTable.NAME, null,
                 whereClause, whereArgs, null,
                 null, null);
@@ -87,13 +89,15 @@ public class SetWordsLearned {
 
     public List<Word> getWords(int count) throws Exception {
 
+        if (wordsList == null) {
+            wordsList = getAllWordsFromDB();
+        }
 
         List<Word> words = new ArrayList<>();
-        WordLearnedCursorWrapper cursor = queryWords(null, null);
 
-        int numInBD = cursor.getCount();
+        int numInBD = wordsList.size();
         if (numInBD == 0) {
-            throw new Exception("SetWordsLearned: List<Word> getWords(int count): No learned words");
+            throw new Exception("SetWordsLearned: List<Word> getWords(int count): No words learned");
         }
 
         if (count >= numInBD) {
@@ -106,45 +110,21 @@ public class SetWordsLearned {
         Random random = new Random();
         for (int i = 0; i < count; ++i) {
 
-            int temp = -1;
+            int temp;
             do {
                 temp = random.nextInt((int) numInBD);
             } while (inds.contains(temp));
             inds.add(temp);
         }
 
-        Collections.sort(inds);
-
-        int numOfSelected = 0;
-        int ind = 0;
-
-        // choose only count random words
-        try {
-
-            if (cursor.moveToFirst()) {
-
-                while (!cursor.isAfterLast() && numOfSelected < count) {
-                    if (ind == inds.get(numOfSelected)) {
-                        words.add(cursor.getWord());
-                        ++numOfSelected;
-                    }
-                    cursor.moveToNext();
-                    ++ind;
-                }
-            }
-
-        } finally {
-            cursor.close();
+        for (int ind : inds) {
+            words.add(wordsList.get(ind));
         }
 
         return words;
     }
 
-    public List<Word> getAllWords() {
-
-        if (wordsList != null) {
-            return new ArrayList<>(wordsList);
-        }
+    private List<Word> getAllWordsFromDB() {
 
         List<Word> words = new ArrayList<>();
         WordLearnedCursorWrapper cursor = queryWords(null, null);
@@ -161,8 +141,17 @@ public class SetWordsLearned {
             cursor.close();
         }
 
-        wordsList = words;
         return new ArrayList<>(words);
+    }
+
+    public List<Word> getAllWords() {
+
+        if (wordsList != null) {
+            return new ArrayList<>(wordsList);
+        }
+
+        wordsList = getAllWordsFromDB();
+        return new ArrayList<>(wordsList);
     }
 
     public int getWordsNum() {

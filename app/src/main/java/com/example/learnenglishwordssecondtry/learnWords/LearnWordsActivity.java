@@ -94,7 +94,7 @@ public class LearnWordsActivity extends AppCompatActivity {
             TextView wayToLearnText;
             Button goHomeButton;
 
-            wayToLearnText = findViewById(R.id.text_wayToLearn);
+            wayToLearnText = findViewById(R.id.tv_wayToLearnValue);
             goHomeButton = findViewById(R.id.button_goHome);
 
             answerStatusText = findViewById(R.id.text_answerStatus);
