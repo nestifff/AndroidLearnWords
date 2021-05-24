@@ -120,6 +120,12 @@ class WordsListActivity :
         adapter!!.notifyDataSetChanged()
     }
 
+    override fun onDestroy() {
+        pushWordsLauncher.unregister()
+        pullWordsLauncher.unregister()
+        super.onDestroy()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (!isShowLearned) {
             val inflater = menuInflater
@@ -135,6 +141,9 @@ class WordsListActivity :
         (adapter as WordsListAdapter).wordsSet?.sortBy { it.rus }
 
         (adapter as WordsListAdapter).addWordInRV(word)
+
+        findViewById<TextView>(R.id.tv_size_words_set).text = "Amount: " + currWordsSet.size
+
     }
 
     @SuppressLint("NonConstantResourceId")
